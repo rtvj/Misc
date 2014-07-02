@@ -149,10 +149,10 @@ UINT64 cyclesElapsed(UINT64 stopTSC, UINT64 startTSC)
 #endif
 
 
-UINT32 idx = 0, jdx = 1;
-UINT32 seqIterations = FIB_LIMIT_FOR_32_BIT;
-UINT32 reqIterations = 1, Iterations = 1;
-UINT32 fib = 0, fib0 = 0, fib1 = 1;
+UINT64 idx = 0, jdx = 1;
+UINT64 seqIterations = FIB_LIMIT_FOR_32_BIT;
+UINT64 reqIterations = 1, Iterations = 1;
+UINT64 fib = 0, fib0 = 0, fib1 = 1;
 
 #define FIB_TEST(seqCnt, iterCnt)      \
    for(idx=0; idx < iterCnt; idx++)    \

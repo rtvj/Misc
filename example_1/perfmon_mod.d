@@ -1,4 +1,4 @@
-perfmon.o: perfmon.c /usr/include/stdio.h /usr/include/features.h \
+perfmon_mod.o: perfmon_mod.c /usr/include/stdio.h /usr/include/features.h \
  /usr/include/x86_64-linux-gnu/bits/predefs.h \
  /usr/include/x86_64-linux-gnu/sys/cdefs.h \
  /usr/include/x86_64-linux-gnu/bits/wordsize.h \

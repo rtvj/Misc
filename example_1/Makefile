@@ -15,7 +15,7 @@ LIBS=
 #PRODUCT=perfmon
 
 HFILES=
-SRC= perfmon
+SRC= perfmon_mod
 
 SRCS= ${HFILES}.h ${SRC}.c
 OBJS= ${SRC}.o
@@ -27,7 +27,7 @@ clean:
 	-rm -f ${SRC}
 
 perfmon: ${OBJS}
-	$(CC) $(CCFILES) $(LDFLAGS) $(CFLAGS) -o $@ $(OBJS) $(LIBS)
+	$(CC) $(CCFILES) $(LDFLAGS) $(CFLAGS) -o ${SRC} $(OBJS) $(LIBS)
 
 depend:
 

@@ -56,6 +56,6 @@ int main( int argc, char *argv[] )
    stopTOD=readTOD();
    // END Timed Fibonacci Test
    DT = elapsedTOD(stopTOD, startTOD);
-   printf("Fibbonacci test run in DT=%Le secs\n", DT);
+   printf("Fibbonacci test run in DT=%Lf secs\n", DT);
    printf("\nFibonacci(%llu)=%llu\n", seqIterations, fib);
 }
