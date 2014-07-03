@@ -129,7 +129,7 @@ int main (int argc, char *argv[])
    {
       sscanf(argv[1], "%llu", &reqIterations);
 
-      seqIterations = reqIterations % FIB_LIMIT_FOR_32_BIT;
+      seqIterations = reqIterations;// % FIB_LIMIT_FOR_32_BIT;
       Iterations = reqIterations / seqIterations;
       //printf("request=%llu, seqIter=%llu, iter=%llu, total=%llu, Diff=%lld\n", reqIterations, seqIterations, Iterations, (seqIterations*Iterations), (reqIterations - (seqIterations*Iterations))); 
    }
