@@ -15,7 +15,7 @@ LIBS=
 #PRODUCT=perfmon
 
 HFILES=
-SRC= perfmon
+SRC= perfmon_mod
 
 SRCS= ${HFILES}.h ${SRC}.c
 OBJS= ${SRC}.o

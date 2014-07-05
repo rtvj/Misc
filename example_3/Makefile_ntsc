@@ -5,10 +5,10 @@ CDEFS=
 CFLAGS= -O3 -g $(INCLUDE_DIRS) $(CDEFS)
 LIBS= -lpthread
 
-PRODUCT=testdigest
+PRODUCT=testdigest_ntsc
 
 HFILES= md5.h config.h sha1.h crc.h sha2.h
-CFILES= testdigest.c md5.c sha1.c crc.c sha2.c
+CFILES= testdigest_ntsc.c md5.c sha1.c crc.c sha2.c
 
 SRCS= ${HFILES} ${CFILES}
 OBJS= ${CFILES:.c=.o}

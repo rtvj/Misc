@@ -4,7 +4,7 @@
 #
 INCLUDE_DIRS = 
 LIB_DIRS = 
-
+CC=gcc
 CDEFS=
 CFLAGS= -O -g $(INCLUDE_DIRS) $(CDEFS) $(RC_CFLAGS) -F/System/Library/PrivateFrameworks
 LDFLAGS= $(LIB_DIRS)

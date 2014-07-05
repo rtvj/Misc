@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <sched.h>
-
+#include <semaphore.h>
 // This example creates a NUM_THREADS which all compute the 
 // Fibonacci sequence concurrently.  It is useful to learn
 // about the POSIX API to OS threads and to determine if 
@@ -17,6 +17,10 @@ pthread_t threads[NUM_THREADS];
 double DT[NUM_THREADS];
 double startTOD;
 double stopTOD;
+
+// POSIX Mutex-semaphore
+
+sem_t sema;
 
 // POSIX thread declarations and scheduling attributes
 //
@@ -42,6 +46,7 @@ UINT64 seqIterations = FIB_LIMIT_FOR_32_BIT, Iterations = 1;
 
 void *fibSeq(void *threadid)
 {
+   sem_wait(&sema);
    UINT64 fib = 0, fib0 = 0, fib1 = 1;
    UINT64 idx = 0, jdx = 1;
 
@@ -85,14 +90,18 @@ void *testThread(void *threadid)
    int i;
 
    // THREADED TEST
-   //
-
+   // perform a semTake here
+   for(i=0; i<NUM_THREADS; i++) 				// The main thread performs semTakes here
+       sem_wait(&sema);
    // Start time for all threads
    startTOD=readTOD();
 
-   for(i=0;i<NUM_THREADS;i++)
+   for(i=0;i<NUM_THREADS;i++)							// The threads are created here which then try to take the semaphore
        pthread_create(&threads[i], &rt_sched_attr, fibSeq, (void *)i);
-
+   
+   for(i=0; i<NUM_THREADS; i++)						// Here the main thread performs semGive to start the child threads
+       sem_post(&sema);
+   
    for(i=0;i<NUM_THREADS;i++)
        pthread_join(threads[i], NULL);
 
@@ -108,7 +117,8 @@ void *testThread(void *threadid)
 
    // Start time for sequential function calls
    startTOD=readTOD();
-
+   for(i=0; i<NUM_THREADS; i++)
+       sem_post(&sema);
    for(i=0;i<NUM_THREADS;i++)
        fibSeq((void *)i);
 
@@ -140,7 +150,7 @@ int main (int argc, char *argv[])
 
    printf("Before adjustments to scheduling policy:\n");
    print_scheduler();
-
+   sem_init(&sema, 0, NUM_THREADS);
    // Set POSIX Scheduling Policy
    //
    // Note that FIFO is essentially priority preemptive run to
@@ -211,7 +221,7 @@ int main (int argc, char *argv[])
    {
        printf("ERROR; pthread_create() rc is %d\n", rc); perror(NULL); exit(-1);
    }
-
+   printf("Before main join: \n");
    pthread_join(main_thread, NULL);
 
    if(pthread_attr_destroy(&rt_sched_attr) != 0)

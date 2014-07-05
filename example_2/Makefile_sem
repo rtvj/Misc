@@ -12,17 +12,17 @@ CFILES= perfmon.c perflib.c
 SRCS= ${HFILES} ${CFILES}
 OBJS= ${CFILES:.c=.o}
 
-all:	perfmon pthread
+all:	perfmon pthread_sem
 
 clean:
 	-rm -f *.o *.d
-	-rm -f perfmon pthread
+	-rm -f perfmon pthread_sem
 
 distclean:
 	-rm -f *.o *.d
-	-rm -f pthread
+	-rm -f pthread_sem
 
-pthread: pthread.o perflib.o
+pthread_sem: pthread_sem.o perflib.o
 	$(CC) $(LDFLAGS) $(CFLAGS) -o $@ $@.o perflib.o -lpthread
 
 perfmon: ${OBJS}

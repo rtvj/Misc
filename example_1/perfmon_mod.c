@@ -17,7 +17,6 @@
 
 #define LONG_LONG_OK
 #define FIB_LIMIT_FOR_32_BIT 47
-#define FIB_LIMIT_FOR_64_BIT 98
 
 typedef unsigned int UINT32;
 
@@ -181,7 +180,7 @@ void fib_wrapper(void)
 int main( int argc, char *argv[] )
 {
    double clkRate = 0.0, fibCPI = 0.0;
-   UINT32 instCnt = 0;
+   UINT64 instCnt = 0;
 
    if(argc == 2)
    {

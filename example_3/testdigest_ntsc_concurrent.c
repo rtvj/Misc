@@ -4,8 +4,12 @@
 #include <pthread.h>
 #include <sched.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <signal.h>
 #include <semaphore.h>
+#include <time.h>
+#include <fcntl.h>
+
 
 #include "md5.h"
 
@@ -16,11 +20,24 @@
 #define TRUE 1
 #define FALSE 0
 
-typedef unsigned long long UINT64;
+typedef unsigned int UINT32;
+typedef unsigned long long int UINT64;
+typedef unsigned char UINT8;
+
 
 UINT64 startTSC = 0;
 UINT64 stopTSC = 0;
 UINT64 cycleCnt = 0;
+
+UINT8 header[22];
+UINT8 Pic[345600*3];
+/*
+UINT8 G[345600];
+UINT8 B[345600];
+UINT8 convR[345600];
+UINT8 convG[345600];
+UINT8 convB[345600];
+*/
 
 static const char test[512]="#0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ##0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ##0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ##0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ##0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ##0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ##0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ##0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ#";
 #if defined(__i386__)
@@ -148,24 +165,31 @@ void setSchedPolicy(void)
 
 void *digestThread(void *threadparam)
 {
-    int i;
+  // Perform the computation of digests on four quadrants of the picture. Supports four threads only
+    int i, j;
     md5_state_t state;
     md5_byte_t digest[16];
     struct timeval StartTime, StopTime;
     unsigned int microsecs = 0;
     double rate;
     threadParamsType *tp = (threadParamsType *)(threadparam);
-
+    
     //printf("Digest thread %d started, active=%d, waiting for release\n", tp->threadID, threadActiveCnt);
     sem_wait (&(startIOWorker[tp->threadID]));
-
+    
+    UINT8 pic_buf[259200];
+    i=tp->threadID;
+    
+    for(j=0; j<259200; j++)
+        pic_buf[j]=Pic[(259200*i)+j];
+    
 
     gettimeofday(&StartTime, 0);
     for(i=0;i<THREAD_ITERATIONS;i++)
     {
 	// Can I just compute this one time?
 	md5_init(&state);
-	md5_append(&state, (const md5_byte_t *)test, strlen(test));
+	md5_append(&state, (const md5_byte_t *)pic_buf, 259200);
 
 	md5_finish(&state, digest);
 
@@ -210,7 +234,7 @@ void thread_shutdown(int signum)
 
 int main(int argc, char *argv[])
 {
-	int i, numThreads, rc;
+	int i, numThreads, rc, bytesLeft, bytesRead, fdin;
 	double rate=0.0;
 	double totalRate=0.0, aveRate=0.0;
 	double clkRate=0.0;
@@ -223,7 +247,7 @@ int main(int argc, char *argv[])
 	unsigned char shaDigest[20];
 	unsigned char shaDigest256[32];
 
-        if(argc < 2)
+        if(argc < 3)
 	{
 		numThreads=4;
 		printf("Will default to 4 synthetic IO workers\n");
@@ -242,7 +266,35 @@ int main(int argc, char *argv[])
 #define SINGLE_THREAD_TESTS
 
 #ifdef SINGLE_THREAD_TESTS
+	
+	
+/*
+ * Read the PPM image here and split the data and header in seperate buffers
+ */
 
+        if((fdin = open(argv[2], O_RDONLY, 0644)) < 0)
+        {
+            printf("Error opening %s\n", argv[2]);
+        }
+	
+
+    bytesLeft=21;
+
+    do
+    {
+        bytesRead=read(fdin, (void *)header, bytesLeft);
+        bytesLeft -= bytesRead;
+    } while(bytesLeft > 0);
+
+    header[21]='\0';
+
+    for(i=0; i<(345600*3); i++)
+    {
+        read(fdin, (void *)&Pic[i], 1);
+        
+    }
+
+	
 	printf("\nSINGLE THREAD TESTS\n");
 	
 	startTSC = readTSC();
@@ -263,7 +315,7 @@ int main(int argc, char *argv[])
 	{
 		// Can I just compute this one time?
 		md5_init(&state);
-		md5_append(&state, (const md5_byte_t *)test, strlen(test));
+		md5_append(&state, (const md5_byte_t *)Pic, 1036800);
 
 		md5_finish(&state, digest);
 	}

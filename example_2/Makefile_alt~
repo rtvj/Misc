@@ -20,9 +20,9 @@ clean:
 
 distclean:
 	-rm -f *.o *.d
-	-rm -f pthread
+	-rm -f pthread_sem
 
-pthread: pthread.o perflib.o
+pthread: pthread_sem.o perflib.o
 	$(CC) $(LDFLAGS) $(CFLAGS) -o $@ $@.o perflib.o -lpthread
 
 perfmon: ${OBJS}
